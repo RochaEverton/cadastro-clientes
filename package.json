@@ -1,0 +1,24 @@
+{
+  "name": "cadastro-clientes",
+  "version": "1.0.0",
+  "description": "CRUD example with Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RochaEverton/cadastro-clientes.git"
+  },
+  "keywords": [
+    "crud",
+    "fs",
+    "nodejs"
+  ],
+  "author": "Everton Rocha",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/RochaEverton/cadastro-clientes/issues"
+  },
+  "homepage": "https://github.com/RochaEverton/cadastro-clientes#readme"
+}
