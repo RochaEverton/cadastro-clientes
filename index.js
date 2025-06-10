@@ -1,9 +1,10 @@
+import db from'./db.js';
 import readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 
 const rl = readline.createInterface({ input, output });
-const customers = [];
 
+const customers = db.getCustomers();
 async function listCustomers() {
     console.clear();
     if (customers.length === 0) {
@@ -27,7 +28,7 @@ async function listCustomers() {
     await rl.question('');
     console.clear();
     console.log('Voltando ao menu principal...');
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Aguardar 2 segundos
+    await new Promise(resolve => setTimeout(resolve, 1000));
     console.clear();
     printMenu();
 }
@@ -87,11 +88,10 @@ async function startRegistration() {
     const name = await getAnswer("Qual o nome e sobrenome do cliente? ", "Nome inválido. Por favor, tente novamente. ", validateName);
     const address = await getAnswer("Qual o endereço do cliente? ", "Endereço inválido. Por favor, tente novamente. ", validateAddress);
     const cpf = await getAnswer("Qual o CPF do cliente? ", "CPF inválido. Por favor, tente novamente. ", validateCPF);
-    
-    const id = customers.length > 0 ? customers[customers.length - 1].id + 1 : 1;
-   
+
+    const id = db.addCustomer(name, address, cpf);
+
     console.log(`Cliente cadastrado: Id: ${id}, Nome: ${name}, Endereço: ${address}, CPF: ${cpf}`);
-    customers.push({name, address,id, cpf});
     await rl.question('Pressione Enter para continuar...');
     printMenu();
 }
