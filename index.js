@@ -141,13 +141,38 @@ async function startRegistration() {
     printMenu();
 }
 
+function validateConfirmation(choice) {
+    choice = choice.toUpperCase();
+    return choice === "S" || choice === "N";
+}
+
+async function deleteCustomers() {
+    console.clear();
+    const id = await getAnswer("Qual o ID do cliente que deseja excluir? ", "ID inválido. Por favor, tente novamente. ", validateId);
+
+    const customer = db.getCustomer(id);
+
+    const choice = await getAnswer(`Confirma a exclusão do cliente ${customer.name}? (S/N)`, "Opção inválida, tente novamente. ", validateConfirmation);
+
+    if(choice.toUpperCase() === "S") {
+        const result = db.deleteCustomer(id);
+            if (result)
+                console.log(`Cliente com ID ${id} deletado com sucesso.`);
+            else 
+                console.log(`Cliente com ID ${id} não encontrado.`);
+    }
+
+    await rl.question('Pressione Enter para continuar...');
+    printMenu();
+}
+
 async function printMenu() {
     console.clear();
     console.log("Menu:");
     console.log("1 - Listar Clientes");
     console.log("2 - Cadastrar Clientes");
     console.log("3 - Editar Cliente");
-    console.log("4 - Deletar Cliente");
+    console.log("4 - Excluir Cliente");
     console.log("5 - Sair");
 
     const answer = await rl.question('Escolha uma opção? ');
@@ -156,7 +181,7 @@ async function printMenu() {
         case '1': listCustomers(); break;
         case '2': startRegistration(); break;
         case '3': startUpdate(); break;
-        case '4': deleteCustomer(); break;
+        case '4': deleteCustomers(); break;
         case '5':
             console.log('Saindo...');
             setTimeout(() => {
@@ -171,6 +196,26 @@ async function printMenu() {
             break;
     }
 }
+function validateLogin(answer){
+    const result = db.testPassword(answer)
+    return result
+}
 
-printMenu();
+async function init() {
+    console.clear();
+    console.log('Bem-vindo ao sistema de gerenciamento de clientes!');
+    const answer = await rl.question('Digite a senha para acessar o sistema: ',validateLogin);
+    
+    if (validateLogin(answer)) {
+        console.log('Senha correta! Acesso concedido.');
+        printMenu();
+    } else {
+        console.log('Senha incorreta! Acesso negado.');
+        setTimeout(() => {
+            console.clear();
+            init();
+        }, 2000);
+    }
+}
+init();
 db.getCustomers();

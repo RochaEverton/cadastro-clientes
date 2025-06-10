@@ -1,5 +1,15 @@
 import fs from 'fs';
 let customers = [];
+let password = "123456";
+
+
+function testPassword(inputPassword) {
+    if (inputPassword === password) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
 function addCustomer(name, address, cpf) {
     const id = customers.length > 0 ? customers[customers.length - 1].id + 1 : 1;
@@ -34,8 +44,30 @@ function updateCustomer(id, newData) {
     return true;
 }
 
+function deleteCustomer(id) {
+    const customersString = fs.readFileSync("db.json", "utf-8");
+    customers = JSON.parse(customersString);
+
+    const customerIndex = customers.findIndex(customer => customer.id === Number(id));
+    if (customerIndex === -1) return false;
+    
+    customers.splice(customerIndex, 1);
+    fs.writeFileSync("db.json", JSON.stringify(customers));
+    
+    return true;
+}
+
+function getCustomer(id) {
+    const customersString = fs.readFileSync("db.json", "utf-8");
+    customers = JSON.parse(customersString);
+    return customers.find(customer => customer.id === Number(id));
+}
+
 export default { 
     addCustomer,
     getCustomers,
-    updateCustomer
+    updateCustomer,
+    deleteCustomer,
+    getCustomer,
+    testPassword
 };
