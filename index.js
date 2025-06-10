@@ -4,9 +4,9 @@ import { stdin as input, stdout as output } from 'node:process';
 
 const rl = readline.createInterface({ input, output });
 
-const customers = db.getCustomers();
 async function listCustomers() {
     console.clear();
+    const customers = db.getCustomers();
     if (customers.length === 0) {
         console.log('Nenhum cliente cadastrado.');
         await rl.question('Pressione Enter para continuar...');
@@ -52,6 +52,7 @@ function validateCPF(cpf) {
     if (!cpf) return false;
     cpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
     if (cpf.length !== 11) return false; // CPF deve ter 11 dígitos
+    /* verifica CPFs inválidos
     if (/^(\d)\1{10}$/.test(cpf)) return false; // Verifica se todos os dígitos são iguais
     let sum = 0;
     let remainder;
@@ -69,7 +70,7 @@ function validateCPF(cpf) {
     remainder = (sum * 10) % 11;
     if (remainder === 10 || remainder === 11) remainder = 0;
     if (remainder !== parseInt(cpf.substring(10, 11))) return false;
-
+    */
     return true;
 }
 
@@ -128,3 +129,4 @@ async function printMenu() {
 }
 
 printMenu();
+db.getCustomers();
