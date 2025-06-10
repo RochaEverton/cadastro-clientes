@@ -5,8 +5,30 @@ const rl = readline.createInterface({ input, output });
 const customers = [];
 
 async function listCustomers() {
-    console.log(customers);
-    await rl.question('Pressione Enter para continuar...');
+    console.clear();
+    if (customers.length === 0) {
+        console.log('Nenhum cliente cadastrado.');
+        await rl.question('Pressione Enter para continuar...');
+        printMenu();
+        return;
+    }
+    console.log('Lista de Clientes:');
+    console.log('-----------------------------------------------------------------------------');
+    console.log('Id | Nome Completo                | Endereço               | CPF');
+    console.log('---|------------------------------|------------------------|-----------------');
+    customers.forEach(customer => {
+        console.log(`${customer.id.toString().padEnd(2)} | ${customer.name.padEnd(28)} | ${customer.address.padEnd(22)} | ${customer.cpf}`);
+    });
+    console.log('-------------------');
+    console.log(`Total de clientes: ${customers.length}`);
+    console.log('-------------------');
+    console.log('Pressione Enter para voltar ao menu principal.');
+    console.log('-------------------');
+    await rl.question('');
+    console.clear();
+    console.log('Voltando ao menu principal...');
+    await new Promise(resolve => setTimeout(resolve, 2000)); // Aguardar 2 segundos
+    console.clear();
     printMenu();
 }
 function validateName(name) {
@@ -25,6 +47,31 @@ function validateAddress(address) {
     return true;
 }
 
+function validateCPF(cpf) {
+    if (!cpf) return false;
+    cpf = cpf.replace(/\D/g, ''); // Remove caracteres não numéricos
+    if (cpf.length !== 11) return false; // CPF deve ter 11 dígitos
+    if (/^(\d)\1{10}$/.test(cpf)) return false; // Verifica se todos os dígitos são iguais
+    let sum = 0;
+    let remainder;
+    for (let i = 1; i <= 9; i++) {
+        sum += parseInt(cpf.substring(i - 1, i)) * (11 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cpf.substring(9, 10))) return false;
+
+    sum = 0;
+    for (let i = 1; i <= 10; i++) {
+        sum += parseInt(cpf.substring(i - 1, i)) * (12 - i);
+    }
+    remainder = (sum * 10) % 11;
+    if (remainder === 10 || remainder === 11) remainder = 0;
+    if (remainder !== parseInt(cpf.substring(10, 11))) return false;
+
+    return true;
+}
+
 async function getAnswer(question, errorMessage, validateFunction) {
     let answer = '';
     do {
@@ -39,7 +86,7 @@ async function startRegistration() {
 
     const name = await getAnswer("Qual o nome e sobrenome do cliente? ", "Nome inválido. Por favor, tente novamente. ", validateName);
     const address = await getAnswer("Qual o endereço do cliente? ", "Endereço inválido. Por favor, tente novamente. ", validateAddress);
-    const cpf = await getAnswer("Qual o CPF do cliente? ", "CPF inválido. Por favor, tente novamente. ", () => true);
+    const cpf = await getAnswer("Qual o CPF do cliente? ", "CPF inválido. Por favor, tente novamente. ", validateCPF);
     
     const id = customers.length > 0 ? customers[customers.length - 1].id + 1 : 1;
    
