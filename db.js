@@ -63,11 +63,19 @@ function getCustomer(id) {
     return customers.find(customer => customer.id === Number(id));
 }
 
+function searchCustomersByName(name) {
+    const customersString = fs.readFileSync("db.json", "utf-8");
+    customers = JSON.parse(customersString);
+    return customers.filter(customer => customer.name.toLowerCase().includes(name.toLowerCase()));
+}
+
+
 export default { 
     addCustomer,
     getCustomers,
     updateCustomer,
     deleteCustomer,
     getCustomer,
-    testPassword
+    testPassword,
+    searchCustomersByName
 };

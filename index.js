@@ -146,6 +146,40 @@ function validateConfirmation(choice) {
     return choice === "S" || choice === "N";
 }
 
+function validateNameSearch(name) {
+    if (!name) return false;
+    const regex = /^[a-zA-ZÀ-ÿ\s]+$/;
+    if (!regex.test(name.trim())) return false;
+    return true;
+}
+
+async function startSearch() {
+    console.clear();
+    const name = await getAnswer("Qual o nome do cliente que deseja pesquisar? ", "Nome inválido. Por favor, tente novamente. ", validateNameSearch);
+
+    const customer = db.searchCustomersByName(name);
+
+    
+    if(customer.length === 0) {
+        console.log(`Nenhum cliente encontrado com o nome "${name}".`);
+    }
+    else {
+        console.log('Clientes encontrados:');
+        console.log('-----------------------------------------------------------------------------');
+        console.log('Id | Nome Completo                | Endereço               | CPF');
+        console.log('---|------------------------------|------------------------|-----------------');
+        customer.forEach(c => {
+            console.log(`${c.id.toString().padEnd(2)} | ${c.name.padEnd(28)} | ${c.address.padEnd(22)} | ${c.cpf}`);
+        });
+        console.log('-------------------');
+        console.log(`Total de clientes encontrados: ${customer.length}`);
+        console.log('-------------------');
+    }
+
+    await rl.question('Pressione Enter para continuar...');
+    printMenu();
+}
+
 async function deleteCustomers() {
     console.clear();
     const id = await getAnswer("Qual o ID do cliente que deseja excluir? ", "ID inválido. Por favor, tente novamente. ", validateId);
@@ -172,8 +206,9 @@ async function printMenu() {
     console.log("1 - Listar Clientes");
     console.log("2 - Cadastrar Clientes");
     console.log("3 - Editar Cliente");
-    console.log("4 - Excluir Cliente");
-    console.log("5 - Sair");
+    console.log("4 - Pesquisar Clientes");
+    console.log("5 - Excluir Cliente");
+    console.log("6 - Sair");
 
     const answer = await rl.question('Escolha uma opção? ');
 
@@ -181,8 +216,9 @@ async function printMenu() {
         case '1': listCustomers(); break;
         case '2': startRegistration(); break;
         case '3': startUpdate(); break;
-        case '4': deleteCustomers(); break;
-        case '5':
+        case '4': startSearch(); break;
+        case '5': deleteCustomers(); break;
+        case '6':
             console.log('Saindo...');
             setTimeout(() => {
             console.clear();
