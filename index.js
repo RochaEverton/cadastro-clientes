@@ -25,20 +25,26 @@ function validateAddress(address) {
     return true;
 }
 
+async function getAnswer(question, errorMessage, validateFunction) {
+    let answer = '';
+    do {
+        answer = await rl.question(question);
+        if (!validateFunction(answer)) console.log(errorMessage);
+    } while (!validateFunction(answer));
+    return answer;
+}
+
 async function startRegistration() {
     console.clear();
 
-    let name = '';
-    do   {
-        name = await rl.question('Qual o nome e sobrenome do cliente? ');
-        if(!validateName(name)) console.log('Nome inválido. Por favor, tente novamente.');
-    } while (!validateName(name));
-
-    const address = await rl.question('Digite o endereço do cliente: ');
+    const name = await getAnswer("Qual o nome e sobrenome do cliente? ", "Nome inválido. Por favor, tente novamente. ", validateName);
+    const address = await getAnswer("Qual o endereço do cliente? ", "Endereço inválido. Por favor, tente novamente. ", validateAddress);
+    const cpf = await getAnswer("Qual o CPF do cliente? ", "CPF inválido. Por favor, tente novamente. ", () => true);
+    
     const id = customers.length > 0 ? customers[customers.length - 1].id + 1 : 1;
-    // Aqui você pode adicionar lógica para salvar os dados do cliente
-    console.log(`Cliente cadastrado: Nome: ${name}, Endereço: ${address}, Id: ${id}`);
-    customers.push({name, address,id });
+   
+    console.log(`Cliente cadastrado: Id: ${id}, Nome: ${name}, Endereço: ${address}, CPF: ${cpf}`);
+    customers.push({name, address,id, cpf});
     await rl.question('Pressione Enter para continuar...');
     printMenu();
 }
