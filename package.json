@@ -20,5 +20,6 @@
   "bugs": {
     "url": "https://github.com/RochaEverton/cadastro-clientes/issues"
   },
-  "homepage": "https://github.com/RochaEverton/cadastro-clientes#readme"
+  "homepage": "https://github.com/RochaEverton/cadastro-clientes#readme",
+  "type": "module"
 }
