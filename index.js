@@ -32,6 +32,11 @@ async function listCustomers() {
     console.clear();
     printMenu();
 }
+
+function validateId(id) {
+    return id > 0;
+}
+
 function validateName(name) {
     if (!name) return false;
     if (name.trim().indexOf(' ') === -1) return false;
@@ -74,6 +79,26 @@ function validateCPF(cpf) {
     return true;
 }
 
+function validateNameUpdate(name) {
+    if (!name) return true;
+    if (name.trim().indexOf(' ') === -1) return false;
+    if (name.trim().length < 3) return false;
+    if (name.trim().length > 50) return false;
+    const regex = /^[a-zA-ZÀ-ÿ\s]+$/;
+    if (!regex.test(name.trim())) return false;
+    return true;
+}
+
+function validateAddressUpdate(address) {
+    if (!address) return true;
+    if (address.trim().length < 5) return false;
+    return true;
+}
+
+function validateCpfUpdate(cpf) {
+    if (!cpf) return true;
+}
+
 async function getAnswer(question, errorMessage, validateFunction) {
     let answer = '';
     do {
@@ -83,11 +108,30 @@ async function getAnswer(question, errorMessage, validateFunction) {
     return answer;
 }
 
+async function startUpdate() {
+    console.clear();
+
+    const id = await getAnswer("Qual o ID do cliente? ", "ID inválido. Por favor, tente novamente. ", validateId);
+    const name = await getAnswer("Qual o novo nome e sobrenome do cliente? Deixe em branco para manter o mesmo nome: ", "Nome inválido. Por favor, tente novamente. ", validateNameUpdate);
+    const address = await getAnswer("Qual a nova Cidade/UF do cliente? Deixe em branco para manter o mesmo endereço: ", "Endereço inválido. Por favor, tente novamente. ", validateAddressUpdate);
+    const cpf = await getAnswer("Qual o novo CPF do cliente? Deixe em branco para manter o mesmo CPF: ", "CPF inválido. Por favor, tente novamente. ", validateCpfUpdate);
+
+    const result = db.updateCustomer(id, {name, address, cpf});
+
+    if (result){
+    console.log(`Cliente atualizado com sucesso: Id: ${id}, Nome: ${name}, Endereço: ${address}, CPF: ${cpf}`);
+    } else {
+    console.log(`Cliente com ID ${id} não encontrado.`);
+    }  
+    await rl.question('Pressione Enter para continuar...');
+    printMenu();
+}
+
 async function startRegistration() {
     console.clear();
 
     const name = await getAnswer("Qual o nome e sobrenome do cliente? ", "Nome inválido. Por favor, tente novamente. ", validateName);
-    const address = await getAnswer("Qual o endereço do cliente? ", "Endereço inválido. Por favor, tente novamente. ", validateAddress);
+    const address = await getAnswer("Qual a Cidade/UF do cliente? ", "Endereço inválido. Por favor, tente novamente. ", validateAddress);
     const cpf = await getAnswer("Qual o CPF do cliente? ", "CPF inválido. Por favor, tente novamente. ", validateCPF);
 
     const id = db.addCustomer(name, address, cpf);
@@ -100,20 +144,20 @@ async function startRegistration() {
 async function printMenu() {
     console.clear();
     console.log("Menu:");
-    console.log("1 - Cadastrar Clientes");
-    console.log("2 - Listar Clientes");
-    console.log("3 - Sair");
+    console.log("1 - Listar Clientes");
+    console.log("2 - Cadastrar Clientes");
+    console.log("3 - Editar Cliente");
+    console.log("4 - Deletar Cliente");
+    console.log("5 - Sair");
 
     const answer = await rl.question('Escolha uma opção? ');
 
     switch (answer) {
-        case '1':
-            startRegistration();
-            break;
-        case '2':
-            listCustomers();
-            break;
-        case '3':
+        case '1': listCustomers(); break;
+        case '2': startRegistration(); break;
+        case '3': startUpdate(); break;
+        case '4': deleteCustomer(); break;
+        case '5':
             console.log('Saindo...');
             setTimeout(() => {
             console.clear();
